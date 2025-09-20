@@ -18,6 +18,8 @@ app.UseSwaggerUI();
 
 app.MapGet("/device_Condition", () => "ac_1: running " + "ac_2: failed");
 
+app.MapGet("/error_logs", () => "(timestamp), (error_logged)");//sample, actual will get the actual errors and load them here
+
 //ambient condition
 app.MapGet("/temperature", () => 
 {
