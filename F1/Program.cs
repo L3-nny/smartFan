@@ -1,4 +1,5 @@
 ﻿using Microsoft.OpenApi.Models;
+using MiniProject.utils;
 
 var builder = WebApplication.CreateBuilder();
 
@@ -36,4 +37,7 @@ app.MapGet("/temperature", () =>
 .WithName("GetTemp")
 .WithOpenApi();
 
-app.Run(); 
+app.Run();
+
+
+

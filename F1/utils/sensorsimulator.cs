@@ -28,15 +28,32 @@ namespace MiniProject.utils
         //generate the next temp reading
         public double GetNextTemperature()
         {
-            double change = (_random.NextDouble() * 2 - 1) * FluctuationStep;
-            _currentTemperature += change;
 
-            
+            //clamp to within range
+            //add a small probability that temp stays the same
+            if (_random.NextDouble() < 0.2)
+            {
+                return _currentTemperature;
+            }
+            else
+            {
+                double change = (_random.NextDouble() * 2 - 1) * FluctuationStep;
+                _currentTemperature += change;
 
+                if (_currentTemperature < MinTemp)
+                {
+                    _currentTemperature = MinTemp;
+                }
+                else if (_currentTemperature > MaxTemp)
+                {
+                    _currentTemperature = MaxTemp;
+                }
+                return _currentTemperature;
+
+
+
+            }
         }
     }
 }
-
-double int1 = _random.NextDouble()
-Console.WriteLine($"{int1}")
 
