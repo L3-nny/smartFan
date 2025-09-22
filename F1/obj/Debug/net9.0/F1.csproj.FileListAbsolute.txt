@@ -32,3 +32,4 @@
 /mnt/e/Burn-dev/C#/MiniProject1/F1/obj/Debug/net9.0/F1.pdb
 /mnt/e/Burn-dev/C#/MiniProject1/F1/obj/Debug/net9.0/F1.genruntimeconfig.cache
 /mnt/e/Burn-dev/C#/MiniProject1/F1/obj/Debug/net9.0/ref/F1.dll
+/mnt/e/Burn-dev/C#/MiniProject1/F1/obj/Debug/net9.0/F1.sourcelink.json

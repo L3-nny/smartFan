@@ -483,19 +483,19 @@
     ]
   },
   "packageFolders": {
-    "/home/lenny/.nuget/packages/": {}
+    "C:\\Users\\Admin\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/mnt/e/Burn-dev/C#/MiniProject1/F1/F1.csproj",
+      "projectUniqueName": "E:\\Burn-dev\\C#\\MiniProject1\\F1\\F1.csproj",
       "projectName": "F1",
-      "projectPath": "/mnt/e/Burn-dev/C#/MiniProject1/F1/F1.csproj",
-      "packagesPath": "/home/lenny/.nuget/packages/",
-      "outputPath": "/mnt/e/Burn-dev/C#/MiniProject1/F1/obj/",
+      "projectPath": "E:\\Burn-dev\\C#\\MiniProject1\\F1\\F1.csproj",
+      "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+      "outputPath": "E:\\Burn-dev\\C#\\MiniProject1\\F1\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/lenny/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -519,7 +519,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.200"
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net9.0": {
@@ -553,7 +553,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
