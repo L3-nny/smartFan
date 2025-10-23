@@ -1,10 +1,11 @@
-using System;
-using SmartFan.Services.Interfaces;
+using smartFan.Services.Interfaces;
 
-namespace TempControl.Services
+namespace smartFan.Services
 {
-    public class ActuatorSimulator : IActuatorService
+    public class ActuatorService : IActuatorService
     {
+        private readonly ILoggerService _logger;
+
         public enum FanSpeed
         {
             Off,
@@ -14,6 +15,11 @@ namespace TempControl.Services
         }
 
         public FanSpeed CurrentSpeed { get; private set; }
+
+        public ActuatorService(ILoggerService logger)
+        {
+            _logger = logger;
+        }
 
         public void Update(double temperature)
         {
@@ -34,10 +40,7 @@ namespace TempControl.Services
                 CurrentSpeed = FanSpeed.High;
             }
 
-            Console.WriteLine($"[Actuator] Temp: {temperature:F1}°C --> Fan: {CurrentSpeed}");
-
-
-
+            _logger.Log($"[Actuator] Temp: {temperature:F1}°C --> Fan: {CurrentSpeed}");
         }
     }
 }

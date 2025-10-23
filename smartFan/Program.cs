@@ -1,5 +1,5 @@
 ﻿using Microsoft.OpenApi.Models;
-using TempControl.Services;
+using smartFan.Services;
 
 var builder = WebApplication.CreateBuilder();
 

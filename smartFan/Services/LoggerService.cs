@@ -8,7 +8,7 @@
 using System;
 using System.IO;
 
-namespace TempControl.Services
+namespace smartFan.Services
 {
     public class Logger
     {
@@ -40,7 +40,7 @@ namespace TempControl.Services
         }
 
         //log temp and fan speed
-        public void LogSystemState(double temperature, ActuatorSimulator.FanSpeed fanSpeed)
+        public void LogSystemState(double temperature, ActuatorService.FanSpeed fanSpeed)
         {
             string state = $"Temp: {temperature:F1}°C, Fan: {fanSpeed}";
             Log(state);

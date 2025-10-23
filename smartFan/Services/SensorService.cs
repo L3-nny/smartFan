@@ -13,7 +13,7 @@ namespace SmartFan.Services
         public double MaxTemp { get; set; }
         public double FluctuationStep { get; set; } //max change per step
 
-        public SensorSimulator(IRandomProvider randomProvider, double minTemp = 20, double maxTemp = 45, double fluctuationStep = 2)
+        public double SensorSimulator(IRandomProvider randomProvider, double minTemp = 20, double maxTemp = 45, double fluctuationStep = 2)
         {
             _random = randomProvider;
             MinTemp = minTemp;
