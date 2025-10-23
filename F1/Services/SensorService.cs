@@ -1,10 +1,10 @@
 using System;
 
-namespace MiniProject.utils
+namespace MiniProject.Services
 {
-    public class SensorSimulator
+    public class SensorSimulator : ISensorSimulator
     {
-        private Random _random;
+        private readonly IRandomProvider _random;
         private double _currentTemperature;
 
         //params
@@ -13,9 +13,9 @@ namespace MiniProject.utils
         public double MaxTemp { get; set; }
         public double FluctuationStep { get; set; } //max change per step
 
-        public SensorSimulator(double minTemp = 20, double maxTemp = 45, double fluctuationStep = 2)
+        public SensorSimulator(IRandomProvider randomProvider, double minTemp = 20, double maxTemp = 45, double fluctuationStep = 2)
         {
-            _random = new Random();
+            _random = randomProvider;
             MinTemp = minTemp;
             MaxTemp = maxTemp;
             FluctuationStep = fluctuationStep;
