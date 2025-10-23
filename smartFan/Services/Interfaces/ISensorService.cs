@@ -1,4 +1,4 @@
-namespace TempControl.Services.Interfaces
+namespace SmartFan.Services.Interfaces
 {
     public interface ISensorService
     {

@@ -1,9 +1,8 @@
-using System;
-using TempControl.Services.Interfaces;
+using smartFan.Services.Interfaces;
 
-namespace TempControl.Services
+namespace SmartFan.Services
 {
-    public class SensorSimulator : ISensorService
+    public class SensorService : ISensorService
     {
         private readonly IRandomProvider _random;
         private double _currentTemperature;

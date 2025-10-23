@@ -1,8 +1,9 @@
 using System;
+using SmartFan.Services.Interfaces;
 
 namespace TempControl.Services
 {
-    public class ActuatorSimulator
+    public class ActuatorSimulator : IActuatorService
     {
         public enum FanSpeed
         {
