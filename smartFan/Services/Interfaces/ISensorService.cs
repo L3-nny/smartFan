@@ -1,4 +1,4 @@
-namespace SmartFan.Services.Interfaces
+namespace smartFan.Services.Interfaces
 {
     public interface ISensorService
     {

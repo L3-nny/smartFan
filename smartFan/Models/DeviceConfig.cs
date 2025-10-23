@@ -1,5 +1,3 @@
-using System;
-
 namespace smartFan.Models
 {
     public class DeviceConfig
