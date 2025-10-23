@@ -9,6 +9,9 @@ namespace smartFan.Models
         public double MinTemp { get; set; }
         public double MaxTemp { get; set; }
         public double FluctuationStep { get; set; }
+        public double ThresholdLow { get; set; }
+        public double ThresholdMedium { get; set; }
+        public double ThresholdHigh { get; set; }
         public bool AutoModeEnabled { get; set; }
 
         //Navigation properties
