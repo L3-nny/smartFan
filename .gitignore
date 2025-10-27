@@ -354,9 +354,6 @@ FodyWeavers.xsd
 *.sqlite
 *.sqlite3
 
-# Production configuration files (may contain secrets)
-appsettings.Production.json
-appsettings.Staging.json
 
 # Environment files
 .env

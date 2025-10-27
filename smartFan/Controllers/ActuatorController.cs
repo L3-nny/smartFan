@@ -105,36 +105,5 @@ namespace smartFan.Controllers
             }
         }
 
-        /// <summary>
-        /// Gets the available fan speed levels.
-        /// </summary>
-        /// <returns>List of available fan speed options.</returns>
-        [HttpGet("speeds")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult GetAvailableSpeeds()
-        {
-            try
-            {
-                var speeds = Enum.GetValues<smartFan.Services.Interfaces.FanSpeed>()
-                    .Select(speed => new
-                    {
-                        Name = speed.ToString(),
-                        Level = (int)speed
-                    })
-                    .ToArray();
-
-                return Ok(new
-                {
-                    AvailableSpeeds = speeds,
-                    CurrentSpeed = _actuatorService.CurrentSpeed.ToString(),
-                    Timestamp = DateTime.UtcNow
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Error getting available fan speeds", ex);
-                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to get available speeds.");
-            }
-        }
     }
 }
