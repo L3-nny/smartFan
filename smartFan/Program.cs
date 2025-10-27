@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using smartFan.Data;
 using smartFan.Repositories.Interfaces;
 using smartFan.Repositories.EfCore;
@@ -11,7 +12,23 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// Add .NET's built-in Memory Cache
+builder.Services.AddMemoryCache();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo 
+    { 
+        Title = "Smart Fan API", 
+        Version = "v1",
+        Description = "A smart temperature monitoring and fan control system"
+    });
+    
+    // Include XML comments
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+});
 
 // Add DbContext
 builder.Services.AddDbContext<smartFanContext>(options =>
@@ -30,7 +47,7 @@ builder.Services.AddScoped<SystemService>();
 
 // Register existing services with their interfaces
 builder.Services.AddScoped<ISensorService, SensorSimulator>();
-builder.Services.AddScoped<IActuatorService, ActuatorService>();
+builder.Services.AddSingleton<IActuatorService, ActuatorService>(); // Shared fan state for dashboard
 builder.Services.AddScoped<ILoggerService, LoggerService>();
 
 // Register IRandomProvider with a concrete implementation

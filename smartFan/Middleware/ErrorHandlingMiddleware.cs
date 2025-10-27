@@ -7,12 +7,10 @@ namespace smartFan.Middleware
     public class ErrorHandlingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILoggerService _logger;
 
-        public ErrorHandlingMiddleware(RequestDelegate next, ILoggerService logger)
+        public ErrorHandlingMiddleware(RequestDelegate next)
         {
             _next = next;
-            _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -29,8 +27,11 @@ namespace smartFan.Middleware
         
         private async Task HandleExceptionAsync(HttpContext context, Exception ex)
         {
+            // Get the logger from request services
+            var logger = context.RequestServices.GetRequiredService<ILoggerService>();
+            
             //Log to my service
-            _logger.LogError($"Unhandled Exception in {context.Request.Path}: {ex.Message}", ex);
+            logger.LogError($"Unhandled Exception in {context.Request.Path}: {ex.Message}", ex);
 
             //Response details
             context.Response.ContentType = "application/json";

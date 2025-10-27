@@ -1,8 +1,8 @@
 using smartFan.Services.Interfaces;
 
-namespace SmartFan.Services
+namespace smartFan.Services
 {
-    public class SensorService : ISensorService
+    public class SensorSimulator : ISensorService
     {
         private readonly IRandomProvider _random;
         private double _currentTemperature;
@@ -13,7 +13,7 @@ namespace SmartFan.Services
         public double MaxTemp { get; set; }
         public double FluctuationStep { get; set; } //max change per step
 
-        public double SensorSimulator(IRandomProvider randomProvider, double minTemp = 20, double maxTemp = 45, double fluctuationStep = 2)
+        public SensorSimulator(IRandomProvider randomProvider, double minTemp = 20, double maxTemp = 45, double fluctuationStep = 2)
         {
             _random = randomProvider;
             MinTemp = minTemp;
@@ -22,7 +22,6 @@ namespace SmartFan.Services
 
             //have a start temp
             _currentTemperature = (MaxTemp + MinTemp) / 2.0;
-
         }
 
         //generate the next temp reading

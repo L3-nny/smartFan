@@ -4,43 +4,35 @@ namespace smartFan.Services
 {
     public class ActuatorService : IActuatorService
     {
-        private readonly ILoggerService _logger;
+        public smartFan.Services.Interfaces.FanSpeed CurrentSpeed { get; private set; }
 
-        public enum FanSpeed
+        public ActuatorService()
         {
-            Off,
-            Low,
-            Medium,
-            High
-        }
-
-        public FanSpeed CurrentSpeed { get; private set; }
-
-        public ActuatorService(ILoggerService logger)
-        {
-            _logger = logger;
+            // Initialize with default off state
+            CurrentSpeed = smartFan.Services.Interfaces.FanSpeed.Off;
         }
 
         public void Update(double temperature)
         {
             if (temperature < 25)
             {
-                CurrentSpeed = FanSpeed.Off;
+                CurrentSpeed = smartFan.Services.Interfaces.FanSpeed.Off;
             }
             else if (temperature < 30)
             {
-                CurrentSpeed = FanSpeed.Low;
+                CurrentSpeed = smartFan.Services.Interfaces.FanSpeed.Low;
             }
             else if (temperature < 34)
             {
-                CurrentSpeed = FanSpeed.Medium;
+                CurrentSpeed = smartFan.Services.Interfaces.FanSpeed.Medium;
             }
             else
             {
-                CurrentSpeed = FanSpeed.High;
+                CurrentSpeed = smartFan.Services.Interfaces.FanSpeed.High;
             }
 
-            _logger.Log($"[Actuator] Temp: {temperature:F1}°C --> Fan: {CurrentSpeed}");
+            // Simple console logging for now (could be enhanced later)
+            Console.WriteLine($"[Actuator] Temp: {temperature:F1}°C --> Fan: {CurrentSpeed}");
         }
     }
 }

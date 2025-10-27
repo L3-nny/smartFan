@@ -1,9 +1,16 @@
 namespace smartFan.Services.Interfaces
-
 {
+    public enum FanSpeed
+    {
+        Off,
+        Low,
+        Medium,
+        High
+    }
+
     public interface IActuatorService
     {
         void Update(double temperature);
-        ActuatorService.FanSpeed CurrentSpeed { get; }
+        FanSpeed CurrentSpeed { get; }
     }
 }
