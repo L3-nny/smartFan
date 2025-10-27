@@ -1,6 +1,6 @@
 namespace smartFan.Models
 {
-    public class DeviceConfig
+    public class DeviceConfigModel
     {
         public int Id { get; set; }
         public int DeviceId { get; set; }
@@ -13,9 +13,9 @@ namespace smartFan.Models
         public bool AutoModeEnabled { get; set; }
 
         //Navigation properties
-        public ICollection<TemperatureLog> TemperatureLogs { get; set; }
-        public ManualOverride ManualOverride { get; set; }
-        public ICollection<ErrorLog> ErrorLogs { get; set; }
+        public ICollection<TemperatureLogModel> TemperatureLogs { get; set; } = new List<TemperatureLogModel>();
+        public ManualOverrideModel? ManualOverride { get; set; }
+        public ICollection<ErrorLogModel> ErrorLogs { get; set; } = new List<ErrorLogModel>();
 
     }
 }
