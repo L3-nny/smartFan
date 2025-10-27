@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using smartFan.Models;
+using System.Collections.Generic;
 
 namespace smartFan.Data
 {
