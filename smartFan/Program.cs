@@ -1,43 +1,53 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using smartFan.Data;
+using smartFan.Repositories.Interfaces;
+using smartFan.Repositories.EfCore;
 using smartFan.Services;
+using smartFan.Services.Interfaces;
+using smartFan.Middleware;
 
-var builder = WebApplication.CreateBuilder();
+var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "TempControl API", Version = "v1"});
-});
+builder.Services.AddSwaggerGen();
+
+// Add DbContext
+builder.Services.AddDbContext<smartFanContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("SmartFanDb")));
+
+// Register Repository interfaces with EF Core implementations
+builder.Services.AddScoped<IDeviceConfigRepository, DeviceConfigRepository>();
+builder.Services.AddScoped<ITemperatureLogRepository, TemperatureLogRepository>();
+builder.Services.AddScoped<IErrorLogRepository, ErrorLogRepository>();
+
+// Register Services
+builder.Services.AddScoped<DeviceConfigService>();
+builder.Services.AddScoped<TemperatureLogService>();
+builder.Services.AddScoped<ErrorLogService>();
+builder.Services.AddScoped<SystemService>();
+
+// Register existing services with their interfaces
+builder.Services.AddScoped<ISensorService, SensorSimulator>();
+builder.Services.AddScoped<IActuatorService, ActuatorService>();
+builder.Services.AddScoped<ILoggerService, LoggerService>();
+
+// Register IRandomProvider with a concrete implementation
+builder.Services.AddScoped<IRandomProvider, RandomProvider>();
 
 var app = builder.Build();
 
-
-//Enable swagger
-app.UseSwagger();
-app.UseSwaggerUI();    
-
-
-app.MapGet("/device_Condition", () => "ac_1: running " + "ac_2: failed");
-
-app.MapGet("/error_logs", () => "(timestamp), (error_logged)");//sample, actual will get the actual errors and load them here
-
-//ambient condition
-app.MapGet("/temperature", () => 
+// Configure the HTTP request pipeline
+if (app.Environment.IsDevelopment())
 {
-    var temp = new
-    {
-        Date = DateTime.Now.ToString("yyyy-MM-dd"),
-        Temp = 25,
-        Summary = "moderate"
-    };
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
+}
 
-    return temp;
-
-})
-.WithName("GetTemp")
-.WithOpenApi();
+app.UseRouting();
+app.UseMiddleware<ErrorHandlingMiddleware>();
+app.MapControllers();
 
 app.Run();
-
-
-
