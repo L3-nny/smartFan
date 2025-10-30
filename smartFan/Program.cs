@@ -35,23 +35,26 @@ builder.Services.AddDbContext<smartFanContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("SmartFanDb")));
 
 // Register Repository interfaces with EF Core implementations
+// Note: DbContext remains scoped, but we'll handle this in repository implementations
 builder.Services.AddScoped<IDeviceConfigRepository, DeviceConfigRepository>();
 builder.Services.AddScoped<ITemperatureLogRepository, TemperatureLogRepository>();
 builder.Services.AddScoped<IErrorLogRepository, ErrorLogRepository>();
 
-// Register Services
+// Register Services - keep these scoped for proper EF Core usage
 builder.Services.AddScoped<DeviceConfigService>();
 builder.Services.AddScoped<TemperatureLogService>();
 builder.Services.AddScoped<ErrorLogService>();
 builder.Services.AddScoped<SystemService>();
 
 // Register existing services with their interfaces
+// Only ActuatorService needs to be singleton to maintain fan state across requests
 builder.Services.AddScoped<ISensorService, SensorSimulator>();
 builder.Services.AddSingleton<IActuatorService, ActuatorService>(); // Shared fan state for dashboard
 builder.Services.AddScoped<ILoggerService, LoggerService>();
-
-// Register IRandomProvider with a concrete implementation
 builder.Services.AddScoped<IRandomProvider, RandomProvider>();
+
+// Register Background Services
+builder.Services.AddHostedService<BackgroundMonitorService>();
 
 var app = builder.Build();
 
