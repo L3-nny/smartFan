@@ -1,0 +1,179 @@
+@using smartFan.BlazorUI.Models
+
+<div class="bg-white rounded-lg shadow-lg p-6">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-gray-800">Fan Control — Hybrid Gauge</h2>
+        <div class="flex items-center">
+            <span class="text-sm text-gray-600 mr-2">Mode:</span>
+            <span class="@GetModeTextClass() font-bold text-sm">@DeviceStatus?.Mode.ToString().ToUpperInvariant()</span>
+        </div>
+    </div>
+
+    <!-- Gauge Visualization -->
+    <div class="relative w-48 h-48 mx-auto mb-6">
+        <!-- Background Arc -->
+        <svg class="transform -rotate-90" width="192" height="192" viewBox="0 0 192 192">
+            <!-- Background circle -->
+            <circle cx="96" cy="96" r="80" fill="none" stroke="#e5e7eb" stroke-width="12"/>
+            
+            <!-- Colored segments -->
+            <circle cx="96" cy="96" r="80" fill="none" stroke="#9ca3af" stroke-width="12"
+                    stroke-dasharray="@GetSegmentLength(0)" stroke-dashoffset="377" 
+                    class="transition-all duration-500"/>
+            <circle cx="96" cy="96" r="80" fill="none" stroke="#3b82f6" stroke-width="12"
+                    stroke-dasharray="@GetSegmentLength(1)" stroke-dashoffset="@GetSegmentOffset(1)" 
+                    class="transition-all duration-500"/>
+            <circle cx="96" cy="96" r="80" fill="none" stroke="#f97316" stroke-width="12"
+                    stroke-dasharray="@GetSegmentLength(2)" stroke-dashoffset="@GetSegmentOffset(2)" 
+                    class="transition-all duration-500"/>
+            <circle cx="96" cy="96" r="80" fill="none" stroke="#ef4444" stroke-width="12"
+                    stroke-dasharray="@GetSegmentLength(3)" stroke-dashoffset="@GetSegmentOffset(3)" 
+                    class="transition-all duration-500"/>
+            
+            <!-- Active indicator -->
+            <circle cx="96" cy="96" r="80" fill="none" stroke="@GetActiveColor()" stroke-width="16"
+                    stroke-dasharray="@GetActiveSegmentLength()" stroke-dashoffset="@GetActiveOffset()" 
+                    class="transition-all duration-700 drop-shadow-lg"/>
+        </svg>
+
+        <!-- Center content -->
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-800 mb-1">
+                    @(DeviceStatus?.CurrentFanSpeed.ToString().ToUpperInvariant() ?? "OFF")
+                </div>
+                <div class="text-sm text-gray-600 mb-2">
+                    @(DeviceStatus?.Temperature.ToString("F1") ?? "0.0")°C
+                </div>
+                <div class="text-xs text-gray-500">
+                    @(DeviceStatus?.Rpm ?? 0) RPM
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Speed Labels -->
+    <div class="flex justify-between text-xs text-gray-500 mb-6 px-4">
+        <span class="@GetLabelClass(FanSpeed.Off)">OFF</span>
+        <span class="@GetLabelClass(FanSpeed.Low)">LOW</span>
+        <span class="@GetLabelClass(FanSpeed.Medium)">MED</span>
+        <span class="@GetLabelClass(FanSpeed.High)">HIGH</span>
+    </div>
+
+    <!-- Control Buttons -->
+    <div class="grid grid-cols-4 gap-2">
+        <button @onclick="() => HandleSpeedChange(FanSpeed.Off)"
+                disabled="@IsLoading"
+                class="@GetControlButtonClass(FanSpeed.Off) py-2 px-3 rounded text-xs font-medium transition-all duration-200 disabled:opacity-50">
+            OFF
+        </button>
+        <button @onclick="() => HandleSpeedChange(FanSpeed.Low)"
+                disabled="@IsLoading"
+                class="@GetControlButtonClass(FanSpeed.Low) py-2 px-3 rounded text-xs font-medium transition-all duration-200 disabled:opacity-50">
+            LOW
+        </button>
+        <button @onclick="() => HandleSpeedChange(FanSpeed.Medium)"
+                disabled="@IsLoading"
+                class="@GetControlButtonClass(FanSpeed.Medium) py-2 px-3 rounded text-xs font-medium transition-all duration-200 disabled:opacity-50">
+            MED
+        </button>
+        <button @onclick="() => HandleSpeedChange(FanSpeed.High)"
+                disabled="@IsLoading"
+                class="@GetControlButtonClass(FanSpeed.High) py-2 px-3 rounded text-xs font-medium transition-all duration-200 disabled:opacity-50">
+            HIGH
+        </button>
+    </div>
+
+    @if (IsLoading)
+    {
+        <div class="flex items-center justify-center mt-4">
+            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500 mr-2"></div>
+            <span class="text-sm text-blue-600">Updating...</span>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public DeviceStatus? DeviceStatus { get; set; }
+    [Parameter] public bool IsLoading { get; set; } = false;
+    [Parameter] public EventCallback<FanSpeed> OnSpeedChange { get; set; }
+
+    private const double CircleCircumference = 2 * Math.PI * 80; // 2πr where r=80
+    private const double SegmentLength = CircleCircumference / 4; // Quarter circle for each speed level
+
+    private async Task HandleSpeedChange(FanSpeed speed)
+    {
+        if (!IsLoading && OnSpeedChange.HasDelegate)
+        {
+            await OnSpeedChange.InvokeAsync(speed);
+        }
+    }
+
+    private string GetSegmentLength(int segment)
+    {
+        return $"{SegmentLength} {CircleCircumference}";
+    }
+
+    private string GetSegmentOffset(int segment)
+    {
+        return (CircleCircumference - (segment * SegmentLength)).ToString("F1");
+    }
+
+    private string GetActiveSegmentLength()
+    {
+        var currentLevel = (int)(DeviceStatus?.CurrentFanSpeed ?? FanSpeed.Off);
+        return $"{SegmentLength * 0.8} {CircleCircumference}";
+    }
+
+    private string GetActiveOffset()
+    {
+        var currentLevel = (int)(DeviceStatus?.CurrentFanSpeed ?? FanSpeed.Off);
+        return (CircleCircumference - (currentLevel * SegmentLength + SegmentLength * 0.1)).ToString("F1");
+    }
+
+    private string GetActiveColor()
+    {
+        return (DeviceStatus?.CurrentFanSpeed ?? FanSpeed.Off) switch
+        {
+            FanSpeed.Off => "#9ca3af",
+            FanSpeed.Low => "#3b82f6",
+            FanSpeed.Medium => "#f97316",
+            FanSpeed.High => "#ef4444",
+            _ => "#9ca3af"
+        };
+    }
+
+    private string GetModeTextClass()
+    {
+        return DeviceStatus?.Mode == FanMode.Auto ? "text-green-600" : "text-orange-600";
+    }
+
+    private string GetLabelClass(FanSpeed speed)
+    {
+        var isActive = DeviceStatus?.CurrentFanSpeed == speed;
+        return isActive ? "font-bold text-gray-800" : "text-gray-500";
+    }
+
+    private string GetControlButtonClass(FanSpeed speed)
+    {
+        var baseClasses = "transition-all duration-200 hover:scale-105 active:scale-95";
+        var isActive = DeviceStatus?.CurrentFanSpeed == speed;
+        
+        return speed switch
+        {
+            FanSpeed.Off => isActive 
+                ? $"{baseClasses} bg-gray-600 text-white" 
+                : $"{baseClasses} bg-gray-100 text-gray-700 hover:bg-gray-200",
+            FanSpeed.Low => isActive 
+                ? $"{baseClasses} bg-blue-600 text-white" 
+                : $"{baseClasses} bg-blue-100 text-blue-700 hover:bg-blue-200",
+            FanSpeed.Medium => isActive 
+                ? $"{baseClasses} bg-orange-600 text-white" 
+                : $"{baseClasses} bg-orange-100 text-orange-700 hover:bg-orange-200",
+            FanSpeed.High => isActive 
+                ? $"{baseClasses} bg-red-600 text-white" 
+                : $"{baseClasses} bg-red-100 text-red-700 hover:bg-red-200",
+            _ => $"{baseClasses} bg-gray-100 text-gray-700"
+        };
+    }
+}

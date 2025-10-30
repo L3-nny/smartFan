@@ -13,6 +13,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+// Add CORS for Blazor WebAssembly app
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazorApp", policy =>
+    {
+        policy.WithOrigins("https://localhost:5001", "http://localhost:5000", "http://localhost:8080")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 // Add .NET's built-in Memory Cache
 builder.Services.AddMemoryCache();
 builder.Services.AddSwaggerGen(c =>
@@ -67,6 +79,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
+app.UseCors("AllowBlazorApp");
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.MapControllers();
 
