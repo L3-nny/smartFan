@@ -78,9 +78,9 @@ namespace smartFan.Controllers
         {
             try
             {
-                if (temperature < 20 || temperature > 45)
+                if (temperature < 10 || temperature > 53)
                 {
-                    return BadRequest("Temperature must be between 20°C and 45°C");
+                    return BadRequest("Temperature must be between 10°C and 53°C");
                 }
 
                 _actuatorService.Update(temperature);
@@ -102,6 +102,54 @@ namespace smartFan.Controllers
             {
                 _logger.LogError($"Error adjusting fan speed for temperature {temperature}°C", ex);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Failed to adjust fan speed.");
+            }
+        }
+
+        /// <summary>
+        /// Sets the fan to a specific speed manually (manual override).
+        /// </summary>
+        /// <param name="fanSpeed">The desired fan speed level.</param>
+        /// <returns>The result of the manual fan speed setting.</returns>
+        [HttpPost("override")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult SetManualFanSpeed([FromBody] string fanSpeed)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(fanSpeed))
+                {
+                    return BadRequest("Fan speed cannot be empty");
+                }
+
+                // Parse the fan speed from string to enum
+                if (!Enum.TryParse<Services.Interfaces.FanSpeed>(fanSpeed, true, out var speed))
+                {
+                    return BadRequest($"Invalid fan speed: {fanSpeed}. Valid options are: Off, Low, Medium, High");
+                }
+
+                // Set the manual override (assuming ActuatorService supports this)
+                _actuatorService.SetManualOverride(speed);
+                
+                // Invalidate cache since speed changed manually
+                _cache.Remove("current_fan_speed");
+                
+                _logger.LogInfo($"Manual fan speed set to: {speed}");
+
+                var result = new
+                {
+                    NewFanSpeed = speed.ToString(),
+                    Mode = "Manual",
+                    Timestamp = DateTime.UtcNow
+                };
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error setting manual fan speed to {fanSpeed}", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to set manual fan speed.");
             }
         }
 
