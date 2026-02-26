@@ -6,6 +6,7 @@ using smartFan.Repositories.EfCore;
 using smartFan.Services;
 using smartFan.Services.Interfaces;
 using smartFan.Middleware;
+using smartFan.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorApp", policy =>
     {
-        policy.WithOrigins("https://localhost:5001", "http://localhost:5000", "http://localhost:8080")
+        policy.WithOrigins("http://localhost:5000", "https://localhost:7291", "http://localhost:3000")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -46,6 +47,11 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<smartFanContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("SmartFanDb")));
 
+// Database write guard: set via configuration or environment variable
+// Default to true (disable writes) to avoid creating/migrating DB during local dev
+var disableDbWrites = builder.Configuration.GetValue<bool>("DisableDatabaseWrites", true);
+builder.Services.AddSingleton(new DatabaseWriteGuard(disableDbWrites));
+
 // Register Repository interfaces with EF Core implementations
 // Note: DbContext remains scoped, but we'll handle this in repository implementations
 builder.Services.AddScoped<IDeviceConfigRepository, DeviceConfigRepository>();
@@ -65,6 +71,9 @@ builder.Services.AddSingleton<IActuatorService, ActuatorService>(); // Shared fa
 builder.Services.AddScoped<ILoggerService, LoggerService>();
 builder.Services.AddScoped<IRandomProvider, RandomProvider>();
 
+//Register the FanSettings from configuration
+builder.Services.Configure<FanSettingsModel>(builder.Configuration.GetSection("FanSettings"));
+
 // Register Background Services
 builder.Services.AddHostedService<BackgroundMonitorService>();
 
@@ -83,4 +92,35 @@ app.UseCors("AllowBlazorApp");
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.MapControllers();
 
-app.Run();
+// Attempt safe startup migration if writes are enabled. If writes are disabled we skip migrations.
+using (var startupScope = app.Services.CreateScope())
+{
+    var guard = startupScope.ServiceProvider.GetRequiredService<DatabaseWriteGuard>();
+    if (!guard.DisableWrites)
+    {
+        try
+        {
+            var ctx = startupScope.ServiceProvider.GetRequiredService<smartFanContext>();
+            ctx.Database.Migrate();
+            Console.WriteLine("[Program] Database migrations applied successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Program] Warning: database migration failed (non-fatal): {ex.Message}");
+        }
+    }
+    else
+    {
+        Console.WriteLine("[Program] Database writes are disabled; skipping migrations.");
+    }
+}
+
+try
+{
+    app.Run();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"[Program] Host terminated with exception: {ex.Message}");
+    // Swallow the exception to avoid crashing the process on startup/runtime DB errors.
+}
