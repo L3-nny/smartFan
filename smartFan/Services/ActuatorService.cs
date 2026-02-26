@@ -36,19 +36,19 @@ namespace smartFan.Services
 
             if (temperature < 25)
             {
-                CurrentSpeed = smartFan.Services.Interfaces.FanSpeed.Off;
+                CurrentSpeed = FanSpeed.Off;
             }
             else if (temperature < 30)
             {
-                CurrentSpeed = smartFan.Services.Interfaces.FanSpeed.Low;
+                CurrentSpeed = FanSpeed.Low;
             }
             else if (temperature < 34)
             {
-                CurrentSpeed = smartFan.Services.Interfaces.FanSpeed.Medium;
+                CurrentSpeed = FanSpeed.Medium;
             }
             else
             {
-                CurrentSpeed = smartFan.Services.Interfaces.FanSpeed.High;
+                CurrentSpeed = FanSpeed.High;
             }
 
             if (previousSpeed != CurrentSpeed)
