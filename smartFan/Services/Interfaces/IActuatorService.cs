@@ -12,5 +12,7 @@ namespace smartFan.Services.Interfaces
     {
         void Update(double temperature);
         FanSpeed CurrentSpeed { get; }
+        void SetManualOverride(FanSpeed fanSpeed);
+        bool IsManualOverrideActive { get; }
     }
 }
