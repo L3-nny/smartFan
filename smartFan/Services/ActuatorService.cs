@@ -1,4 +1,6 @@
+using smartFan.Models;
 using smartFan.Services.Interfaces;
+using Microsoft.Extensions.Options;
 
 namespace smartFan.Services
 {
@@ -6,14 +8,16 @@ namespace smartFan.Services
     {
         public FanSpeed CurrentSpeed { get; private set; }
         
-        // Manual override fields
+        private readonly FanSettingsModel _fanSettings;
         private bool _manualOverrideActive = false;
         private DateTime _manualOverrideExpiry;
         private readonly TimeSpan _overrideDuration = TimeSpan.FromMinutes(5);
-        public ActuatorService()
+        public ActuatorService(IOptions<FanSettingsModel> options)
         {
-            // Initialize with default off state
-            CurrentSpeed = FanSpeed.Off;
+            _fanSettings = options.Value;
+
+            CurrentSpeed = FanSpeed.Off; // Default to off  
+    
         }
 
         public void Update(double temperature)
@@ -34,15 +38,15 @@ namespace smartFan.Services
 
             var previousSpeed = CurrentSpeed;
 
-            if (temperature < 25)
+            if (temperature < _fanSettings.ThresholdOff)
             {
                 CurrentSpeed = FanSpeed.Off;
             }
-            else if (temperature < 30)
+            else if (temperature < _fanSettings.ThresholdLow)
             {
                 CurrentSpeed = FanSpeed.Low;
             }
-            else if (temperature < 34)
+            else if (temperature < _fanSettings.ThresholdMedium)
             {
                 CurrentSpeed = FanSpeed.Medium;
             }
