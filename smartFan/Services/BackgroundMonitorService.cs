@@ -1,4 +1,6 @@
+using smartFan.Models;
 using smartFan.Services.Interfaces;
+using Microsoft.Extensions.Options;
 
 namespace smartFan.Services
 {
@@ -10,17 +12,19 @@ namespace smartFan.Services
     {
         private readonly IActuatorService _actuatorService; // Singleton, safe to inject
         private readonly IServiceProvider _serviceProvider;
+        private readonly FanSettingsModel _fanSettings;
         private readonly TimeSpan _monitoringInterval;
 
         public BackgroundMonitorService(
             IActuatorService actuatorService, // Only inject singleton services directly
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            IOptions<FanSettingsModel> fanSettingsOptions) // Inject the mapped fan settings configuration options
         {
             _actuatorService = actuatorService;
             _serviceProvider = serviceProvider;
+            _fanSettings = fanSettingsOptions.Value;
             _monitoringInterval = TimeSpan.FromSeconds(5); // Check every 5 seconds
         }
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             Console.WriteLine("[BackgroundMonitor] Background Monitor Service started - automatic fan control active");
@@ -40,7 +44,9 @@ namespace smartFan.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"[BackgroundMonitor] Critical error in Background Monitor Service: {ex.Message}");
-                throw; // Re-throw to indicate service failure
+                // Don't re-throw here: an unhandled exception in a background service will
+                // bring down the host. Log and exit the background loop gracefully.
+                return;
             }
         }
 
@@ -96,7 +102,6 @@ namespace smartFan.Services
                 {
                     var temperatureLog = new TemperatureLog
                     {
-                        DeviceConfigId = 1, // Default device
                         Temperature = temperature,
                         FanSpeed = fanSpeed.ToString(),
                         Timestamp = DateTime.UtcNow,
