@@ -4,7 +4,7 @@ namespace smartFan.Services
 {
     public class ActuatorService : IActuatorService
     {
-        public smartFan.Services.Interfaces.FanSpeed CurrentSpeed { get; private set; }
+        public FanSpeed CurrentSpeed { get; private set; }
         
         // Manual override fields
         private bool _manualOverrideActive = false;
