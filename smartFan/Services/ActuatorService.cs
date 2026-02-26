@@ -13,7 +13,7 @@ namespace smartFan.Services
         public ActuatorService()
         {
             // Initialize with default off state
-            CurrentSpeed = smartFan.Services.Interfaces.FanSpeed.Off;
+            CurrentSpeed = FanSpeed.Off;
         }
 
         public void Update(double temperature)
