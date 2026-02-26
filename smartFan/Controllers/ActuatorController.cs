@@ -33,16 +33,15 @@ namespace smartFan.Controllers
         /// <returns>The current fan speed level.</returns>
         [HttpGet("speed")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult GetCurrentFanSpeed()
         {
             try
             {
                 const string cacheKey = "current_fan_speed";
                 
-                // Use IMemoryCache.GetOrCreate - simpler and more efficient
                 var result = _cache.GetOrCreate(cacheKey, entry =>
                 {
-                    // Set cache expiration
                     entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10);
                     
                     var currentSpeed = _actuatorService.CurrentSpeed;
@@ -86,7 +85,6 @@ namespace smartFan.Controllers
                 _actuatorService.Update(temperature);
                 var newSpeed = _actuatorService.CurrentSpeed;
                 
-                // Invalidate the fan speed cache since it changed
                 _cache.Remove("current_fan_speed");
                 
                 _logger.LogInfo($"Fan speed adjusted for temperature {temperature:F1}°C: {newSpeed}");
@@ -123,28 +121,22 @@ namespace smartFan.Controllers
                     return BadRequest("Fan speed cannot be empty");
                 }
 
-                // Parse the fan speed from string to enum
-                if (!Enum.TryParse<Services.Interfaces.FanSpeed>(fanSpeed, true, out var speed))
+                if (!Enum.TryParse<FanSpeed>(fanSpeed, true, out var speed))
                 {
                     return BadRequest($"Invalid fan speed: {fanSpeed}. Valid options are: Off, Low, Medium, High");
                 }
 
-                // Set the manual override (assuming ActuatorService supports this)
                 _actuatorService.SetManualOverride(speed);
-                
-                // Invalidate cache since speed changed manually
                 _cache.Remove("current_fan_speed");
                 
                 _logger.LogInfo($"Manual fan speed set to: {speed}");
 
-                var result = new
+                return Ok(new
                 {
                     NewFanSpeed = speed.ToString(),
                     Mode = "Manual",
                     Timestamp = DateTime.UtcNow
-                };
-
-                return Ok(result);
+                });
             }
             catch (Exception ex)
             {
@@ -153,5 +145,33 @@ namespace smartFan.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets the current status of the manual override.
+        /// </summary>
+        /// <returns>The current override status (active/inactive) and fan speed.</returns>
+        [HttpGet("overrideStatus")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult GetManualOverrideStatus()
+        {
+            try
+            {
+                bool overrideStatus = _actuatorService.IsManualOverrideActive;
+                var currentSpeed = _actuatorService.CurrentSpeed;
+
+                return Ok(new 
+                {
+                    Active = overrideStatus,
+                    CurrentSpeed = currentSpeed.ToString(),
+                    Message = overrideStatus ? "Manual override Active" : "System in Auto mode",
+                    Timestamp = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error retrieving manual override status", ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to retrieve status.");
+            }
+        }
     }
 }
