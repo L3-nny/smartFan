@@ -12,6 +12,7 @@ namespace smartFan.Services.Interfaces
 
         //method to simulate the next temperature reading
         double GetNextTemperature();
+        
         void RegisterHardwareReading(double temperature);
 
     }
