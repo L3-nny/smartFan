@@ -14,6 +14,12 @@ namespace smartFan.Services
         private readonly IServiceProvider _serviceProvider;
         private readonly FanSettingsModel _fanSettings;
         private readonly TimeSpan _monitoringInterval;
+        private double? _lastLoggedTemperature;
+        private FanSpeed? _lastLoggedSpeed;
+
+        /// <summary>
+        /// Initializes the <see cref="BackgroundMonitorService"/>.
+        /// </summary>
 
         public BackgroundMonitorService(
             IActuatorService actuatorService, // Only inject singleton services directly
@@ -61,27 +67,30 @@ namespace smartFan.Services
                 
                 // Get current temperature reading
                 double currentTemperature = sensorService.GetNextTemperature();
-                
-                // Store previous fan speed for comparison
-                var previousSpeed = _actuatorService.CurrentSpeed;
-                
+                  
                 // Update actuator based on temperature
                 _actuatorService.Update(currentTemperature);
                 
                 var newSpeed = _actuatorService.CurrentSpeed;
 
                 // Log system state
-                logger.LogSystemState(currentTemperature, newSpeed, deviceId: 1);
+                //
+                bool tempChanged = !_lastLoggedTemperature.HasValue || Math.Abs(currentTemperature - _lastLoggedTemperature.Value) >= 0.1;
+                bool speedChanged = !_lastLoggedSpeed.HasValue || _lastLoggedSpeed.Value != newSpeed;
 
-                // Log speed changes
-                if (previousSpeed != newSpeed)
+                if (tempChanged || speedChanged)
                 {
-                    Console.WriteLine($"[BackgroundMonitor] Fan speed changed: {previousSpeed} → {newSpeed} (Temp: {currentTemperature:F1}°C)");
-                    logger.LogInfo($"Fan speed changed: {previousSpeed} → {newSpeed} (Temp: {currentTemperature:F1}°C)");
+                    //Log to logger service
+                    logger.LogSystemState(currentTemperature, newSpeed, deviceId: 1);
+
+                    // Optional: Log temperature data to database
+                    await LogTemperatureDataAsync(currentTemperature, newSpeed, stoppingToken);
+
+                    //Update the last logged values
+                    _lastLoggedTemperature = currentTemperature;
+                    _lastLoggedSpeed = newSpeed;
                 }
 
-                // Optional: Log temperature data to database
-                await LogTemperatureDataAsync(currentTemperature, newSpeed, stoppingToken);
             }
             catch (Exception ex)
             {
