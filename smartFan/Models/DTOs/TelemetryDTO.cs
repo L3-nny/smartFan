@@ -10,7 +10,7 @@ namespace smartFan.Models.DTOs
     {
         // "t for temperature"
         [JsonPropertyName("t")]
-        public double Temperature { get; set; }
+        public double? Temperature { get; set; }
         
         // "h for humidity"
         // [JsonPropertyName("h")]
