@@ -66,7 +66,7 @@ builder.Services.AddScoped<SystemService>();
 
 // Register existing services with their interfaces
 // Only ActuatorService needs to be singleton to maintain fan state across requests
-builder.Services.AddSingleton<ISensorService, SensorSimulator>();
+builder.Services.AddSingleton<ISensorService, PhysicalSensorService>();
 builder.Services.AddSingleton<IActuatorService, ActuatorService>(); // Shared fan state for dashboard
 builder.Services.AddScoped<ILoggerService, LoggerService>();
 builder.Services.AddScoped<IRandomProvider, RandomProvider>();
