@@ -18,18 +18,18 @@ namespace smartFan.Controllers
     {
         private readonly IActuatorService _actuatorService;
         private readonly ILoggerService _logger;
-        private readonly ISensorService _physicalSensorService;
+        private readonly ISensorService _sensorService;
 
 
         /// <summary>
         /// Initializes the <see cref="GatewayController"/>
         /// </summary>
 
-        public GatewayController(IActuatorService actuatorService, ILoggerService logger, ISensorService physicalSensorService)
+        public GatewayController(IActuatorService actuatorService, ILoggerService logger, ISensorService sensorService)
         {
             _actuatorService = actuatorService ?? throw new ArgumentNullException(nameof(actuatorService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _physicalSensorService = physicalSensorService ?? throw new ArgumentNullException(nameof(physicalSensorService));
+            _sensorService = sensorService ?? throw new ArgumentNullException(nameof(sensorService));
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace smartFan.Controllers
                 double temperature = data.Temperature.Value;
 
                 //Clean the data and save it in the system memory
-                _physicalSensorService.RegisterHardwareReading(temperature);
+                _sensorService.RegisterHardwareReading(temperature);
                 //Pass the temperature to the actuator service to update the fan speed accordingly
                 _actuatorService.Update(temperature);
 
