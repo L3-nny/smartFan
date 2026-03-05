@@ -57,9 +57,9 @@ namespace smartFan.Services
         //Implement required member despite not being used in this simulator
         public void RegisterHardwareReading(double temperature)
         {
-            //This method is not used in the simulator, but must be implemented to satisfy the ISensorService interface.
-            //In the real implementation, this is called by the HardwareGatewayController to update the current temperature with actual readings from the ESP32.
+            //Update the simulator's state with real data to keep it synced
+            _currentTemperature = temperature;
         }
     }
 }
-
+        
