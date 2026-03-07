@@ -1,30 +1,52 @@
-using System;
+using smartFan.Models;
+using smartFan.Services.Interfaces;
+using Microsoft.Extensions.Options;
 
-namespace TempControl.Services
+namespace smartFan.Services
 {
-    public class ActuatorSimulator
+    public class ActuatorService : IActuatorService
     {
-        public enum FanSpeed
-        {
-            Off,
-            Low,
-            Medium,
-            High
-        }
-
         public FanSpeed CurrentSpeed { get; private set; }
+        
+        private readonly FanSettingsModel _fanSettings;
+        private bool _manualOverrideActive = false;
+        private DateTime _manualOverrideExpiry;
+        private readonly TimeSpan _overrideDuration = TimeSpan.FromMinutes(5);
+        public ActuatorService(IOptions<FanSettingsModel> options)
+        {
+            _fanSettings = options.Value;
+
+            CurrentSpeed = FanSpeed.Off; // Default to off  
+    
+        }
 
         public void Update(double temperature)
         {
-            if (temperature < 25)
+            // Check for manual override expiration
+            if (_manualOverrideActive && DateTime.UtcNow > _manualOverrideExpiry)
+            {
+                _manualOverrideActive = false;
+                Console.WriteLine("[Actuator] Manual override expired, returning to automatic control");
+            }
+
+            // Skip automatic updates if manual override is active
+            if (_manualOverrideActive)
+            {
+                Console.WriteLine($"[Actuator] Manual override active, ignoring temperature {temperature:F1}°C");
+                return;
+            }
+
+            var previousSpeed = CurrentSpeed;
+
+            if (temperature < _fanSettings.ThresholdOff)
             {
                 CurrentSpeed = FanSpeed.Off;
             }
-            else if (temperature < 30)
+            else if (temperature < _fanSettings.ThresholdLow)
             {
                 CurrentSpeed = FanSpeed.Low;
             }
-            else if (temperature < 34)
+            else if (temperature < _fanSettings.ThresholdMedium)
             {
                 CurrentSpeed = FanSpeed.Medium;
             }
@@ -33,10 +55,35 @@ namespace TempControl.Services
                 CurrentSpeed = FanSpeed.High;
             }
 
-            Console.WriteLine($"[Actuator] Temp: {temperature:F1}°C --> Fan: {CurrentSpeed}");
-
-
-
+            if (previousSpeed != CurrentSpeed)
+            {
+                Console.WriteLine($"[Actuator] Temp: {temperature:F1}°C --> Fan: {previousSpeed} → {CurrentSpeed}");
+            }
         }
+
+        /// <summary>
+        /// Manually set fan speed with temporary override
+        /// </summary>
+        public void SetManualOverride(FanSpeed speed)
+        {
+            CurrentSpeed = speed;
+            _manualOverrideActive = true;
+            _manualOverrideExpiry = DateTime.UtcNow.Add(_overrideDuration);
+            Console.WriteLine($"[Actuator] Manual override set: {speed} (expires in {_overrideDuration.TotalMinutes} minutes)");
+        }
+
+        /// <summary>
+        /// Clear manual override and return to automatic control
+        /// </summary>
+        public void ClearManualOverride()
+        {
+            _manualOverrideActive = false;
+            Console.WriteLine("[Actuator] Manual override cleared, automatic control resumed");
+        }
+
+        /// <summary>
+        /// Check if manual override is currently active
+        /// </summary>
+        public bool IsManualOverrideActive => _manualOverrideActive && DateTime.UtcNow <= _manualOverrideExpiry;
     }
 }

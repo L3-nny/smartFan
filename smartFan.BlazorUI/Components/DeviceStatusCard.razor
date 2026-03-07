@@ -1,0 +1,131 @@
+@using smartFan.BlazorUI.Models
+@using smartFan.BlazorUI.Services
+
+<div class="bg-white rounded-lg shadow-lg p-6 mb-4">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-gray-800">Device @DeviceId</h2>
+        <div class="flex items-center">
+            <div class="@GetStatusIndicatorClass() w-3 h-3 rounded-full mr-2"></div>
+            <span class="@GetStatusTextClass() text-sm font-medium">@GetStatusText()</span>
+        </div>
+    </div>
+
+    @if (DeviceStatus != null && DeviceStatus.IsOnline)
+    {
+        <div class="space-y-4">
+            <!-- Temperature Display -->
+            <div class="bg-blue-50 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-600 text-sm font-medium">Temperature</span>
+                    @if (DeviceStatus.Mode == FanMode.Auto)
+                    {
+                        <div class="flex items-center">
+                            <span class="text-blue-600 text-xs font-medium mr-1">AUTO</span>
+                            <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                        </div>
+                    }
+                </div>
+                <div class="text-2xl font-bold text-gray-800">
+                    @DeviceStatus.Temperature.ToString("F1")@DeviceStatus.TemperatureUnit
+                </div>
+            </div>
+
+            <!-- Fan Speed Display -->
+            <div class="@GetFanSpeedCardClass() rounded-lg p-4">
+                <span class="text-gray-600 text-sm font-medium">Fan Speed</span>
+                <div class="flex items-center justify-between">
+                    <div class="text-2xl font-bold text-gray-800">
+                        @DeviceStatus.CurrentFanSpeed.ToString().ToUpperInvariant()
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        @DeviceStatus.Rpm RPM
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mode Display -->
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-600">Mode:</span>
+                <div class="flex items-center">
+                    <span class="@GetModeTextClass() font-medium">@DeviceStatus.Mode</span>
+                    @if (DeviceStatus.Mode == FanMode.Auto)
+                    {
+                        <svg class="w-4 h-4 ml-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+                        </svg>
+                    }
+                    else
+                    {
+                        <svg class="w-4 h-4 ml-2 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                    }
+                </div>
+            </div>
+
+            <!-- Last Updated -->
+            <div class="text-xs text-gray-400 border-t pt-2">
+                Last updated: @DeviceStatus.LastUpdated.ToString("HH:mm:ss")
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Offline State -->
+        <div class="text-center py-8">
+            <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-12.728 12.728m0 0L5.636 18.364m12.728-12.728L18.364 18.364"></path>
+            </svg>
+            <p class="text-gray-500">Device Offline</p>
+            <p class="text-sm text-gray-400">Unable to connect to device</p>
+        </div>
+    }
+
+    @if (IsLoading)
+    {
+        <!-- Loading Overlay -->
+        <div class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-lg">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public DeviceStatus? DeviceStatus { get; set; }
+    [Parameter] public int DeviceId { get; set; } = 1;
+    [Parameter] public bool IsLoading { get; set; } = false;
+
+    private string GetStatusIndicatorClass()
+    {
+        return DeviceStatus?.IsOnline == true ? "bg-green-400 animate-pulse" : "bg-red-400";
+    }
+
+    private string GetStatusTextClass()
+    {
+        return DeviceStatus?.IsOnline == true ? "text-green-600" : "text-red-600";
+    }
+
+    private string GetStatusText()
+    {
+        return DeviceStatus?.IsOnline == true ? "Online" : "Offline";
+    }
+
+    private string GetFanSpeedCardClass()
+    {
+        if (DeviceStatus == null) return "bg-gray-50";
+        
+        return DeviceStatus.CurrentFanSpeed switch
+        {
+            FanSpeed.Off => "bg-gray-50",
+            FanSpeed.Low => "bg-blue-50",
+            FanSpeed.Medium => "bg-orange-50", 
+            FanSpeed.High => "bg-red-50",
+            _ => "bg-gray-50"
+        };
+    }
+
+    private string GetModeTextClass()
+    {
+        return DeviceStatus?.Mode == FanMode.Auto ? "text-green-600" : "text-orange-600";
+    }
+}

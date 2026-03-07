@@ -1,0 +1,114 @@
+@using smartFan.BlazorUI.Models
+
+<div class="bg-white rounded-lg shadow-lg p-6">
+    <h3 class="text-lg font-bold text-gray-800 mb-4">Manual Override</h3>
+    
+    <div class="grid grid-cols-2 gap-3 mb-4">
+        <button @onclick="() => HandleFanSpeedSelect(FanSpeed.Off)"
+                disabled="@IsLoading"
+                class="@GetButtonClass(FanSpeed.Off) px-4 py-3 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+            <div class="flex flex-col items-center">
+                <svg class="w-5 h-5 mb-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span>OFF</span>
+            </div>
+        </button>
+
+        <button @onclick="() => HandleFanSpeedSelect(FanSpeed.Low)"
+                disabled="@IsLoading"
+                class="@GetButtonClass(FanSpeed.Low) px-4 py-3 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+            <div class="flex flex-col items-center">
+                <svg class="w-5 h-5 mb-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>LOW</span>
+            </div>
+        </button>
+
+        <button @onclick="() => HandleFanSpeedSelect(FanSpeed.Medium)"
+                disabled="@IsLoading"
+                class="@GetButtonClass(FanSpeed.Medium) px-4 py-3 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+            <div class="flex flex-col items-center">
+                <svg class="w-5 h-5 mb-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"></path>
+                </svg>
+                <span>MEDIUM</span>
+            </div>
+        </button>
+
+        <button @onclick="() => HandleFanSpeedSelect(FanSpeed.High)"
+                disabled="@IsLoading"
+                class="@GetButtonClass(FanSpeed.High) px-4 py-3 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+            <div class="flex flex-col items-center">
+                <svg class="w-5 h-5 mb-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"></path>
+                </svg>
+                <span>HIGH</span>
+            </div>
+        </button>
+    </div>
+
+    <div class="text-center">
+        <p class="text-sm text-gray-600">Click a speed to override automatic control</p>
+        @if (IsLoading)
+        {
+            <div class="flex items-center justify-center mt-2">
+                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
+                <span class="text-sm text-blue-600">Adjusting...</span>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(StatusMessage))
+        {
+            <div class="mt-2 text-sm @GetStatusMessageClass()">
+                @StatusMessage
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public FanSpeed? CurrentFanSpeed { get; set; }
+    [Parameter] public bool IsLoading { get; set; } = false;
+    [Parameter] public EventCallback<FanSpeed> OnFanSpeedSelected { get; set; }
+    [Parameter] public string? StatusMessage { get; set; }
+    [Parameter] public bool IsError { get; set; } = false;
+
+    private async Task HandleFanSpeedSelect(FanSpeed fanSpeed)
+    {
+        if (!IsLoading && OnFanSpeedSelected.HasDelegate)
+        {
+            await OnFanSpeedSelected.InvokeAsync(fanSpeed);
+        }
+    }
+
+    private string GetButtonClass(FanSpeed fanSpeed)
+    {
+        var baseClasses = "text-white border-2 transform hover:scale-105 active:scale-95";
+        var isSelected = CurrentFanSpeed == fanSpeed;
+        
+        var colorClasses = fanSpeed switch
+        {
+            FanSpeed.Off => isSelected 
+                ? "bg-gray-600 border-gray-700 shadow-lg" 
+                : "bg-gray-500 border-gray-600 hover:bg-gray-600",
+            FanSpeed.Low => isSelected 
+                ? "bg-blue-600 border-blue-700 shadow-lg" 
+                : "bg-blue-500 border-blue-600 hover:bg-blue-600",
+            FanSpeed.Medium => isSelected 
+                ? "bg-orange-600 border-orange-700 shadow-lg" 
+                : "bg-orange-500 border-orange-600 hover:bg-orange-600",
+            FanSpeed.High => isSelected 
+                ? "bg-red-600 border-red-700 shadow-lg" 
+                : "bg-red-500 border-red-600 hover:bg-red-600",
+            _ => "bg-gray-500 border-gray-600"
+        };
+
+        return $"{baseClasses} {colorClasses}";
+    }
+
+    private string GetStatusMessageClass()
+    {
+        return IsError ? "text-red-600" : "text-green-600";
+    }
+}

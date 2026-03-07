@@ -1,7 +1,6 @@
-using System;
-using TempControl.Services.Interfaces;
+using smartFan.Services.Interfaces;
 
-namespace TempControl.Services
+namespace smartFan.Services
 {
     public class SensorSimulator : ISensorService
     {
@@ -23,7 +22,6 @@ namespace TempControl.Services
 
             //have a start temp
             _currentTemperature = (MaxTemp + MinTemp) / 2.0;
-
         }
 
         //generate the next temp reading
@@ -55,6 +53,13 @@ namespace TempControl.Services
 
             }
         }
+
+        //Implement required member despite not being used in this simulator
+        public void RegisterHardwareReading(double temperature)
+        {
+            //Update the simulator's state with real data to keep it synced
+            _currentTemperature = temperature;
+        }
     }
 }
-
+        

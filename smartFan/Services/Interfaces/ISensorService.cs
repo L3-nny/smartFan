@@ -1,4 +1,4 @@
-namespace TempControl.Services.Interfaces
+namespace smartFan.Services.Interfaces
 {
     public interface ISensorService
     {
@@ -12,6 +12,8 @@ namespace TempControl.Services.Interfaces
 
         //method to simulate the next temperature reading
         double GetNextTemperature();
+        //method to be called by HardwareGatewayController to update the current temperature with actual reading from ESP32
+        void RegisterHardwareReading(double temperature);
 
     }
     
