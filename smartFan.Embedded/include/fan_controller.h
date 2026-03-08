@@ -5,8 +5,10 @@
 
 class FanController {
     public:
-        static void init();
-        static void setSpeed(int level);
+        void init();
+        void updateState(int speed, int mode);
+        void setEmergencySpeed();
+
 };
 
 #endif
