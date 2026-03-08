@@ -2,13 +2,13 @@
 #include "systemManager.h"
 
 
-SystemManager system;
+SystemManager fanSystem;
 
 void setup() {
     Serial.begin(115200);
-    system.setup();
+    fanSystem.setup();
 }
 
 void loop() {
-    system.update();
+    fanSystem.update();
 }
