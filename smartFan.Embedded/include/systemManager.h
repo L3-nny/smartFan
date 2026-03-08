@@ -1,6 +1,7 @@
 #ifndef SYSTEM_MANAGER_H
 #define SYSTEM_MANAGER_H
 
+#include <Arduino.h>
 #include "gateway_client.h"
 #include "fan_controller.h"
 
