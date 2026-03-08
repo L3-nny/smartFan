@@ -13,7 +13,7 @@ private:
     GatewayClient _gateway;
     FanController _fan;
     
-    unsigned long _lastUpdate = 0;
+    unsigned long _lastUpdated = 0;
     const unsigned long _interval = 4500; 
 
     void _processTick(); 
