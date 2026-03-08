@@ -21,6 +21,7 @@ public:
 
 private:
     unsigned long lastWifiRetry = 0;
+    bool isFirstConnectionAttempt = true;
 };
 
 #endif
