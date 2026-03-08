@@ -35,3 +35,26 @@ void loop() {
     
         }
     }
+
+void loop() {
+    unsigned long currentTime = millis();
+
+    //Fetch the temperature data every 5 seconds
+    if (WiFi.status() == WL_CONNECTED && (currentTime - lastUpdateTime) >= 5000) {
+        int rawValue = analogRead(THERMISTOR_PIN);
+        float celsius = ThermalMath::calculateCelsius(rawValue);
+        Serial.print("Temperature: celsius);");
+
+        //Create JSON payload
+        StaticJsonDocument<128> doc;
+        doc["t"] = celsius;
+        String jsonPayload;
+        serializeJson(doc, jsonPayload);
+        
+        //Send json payload to  the server
+        HTTPClient http;
+        http.begin(SERVER_URL);
+        http.addHeader("Content-Type", "application/json");
+        int httpResponseCode = http.POST(jsonPayload);
+    }
+}
