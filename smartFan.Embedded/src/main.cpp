@@ -54,6 +54,10 @@ void loop() {
         // Send json payload to the server
         HTTPClient http;
         http.begin(SERVER_URL);
+
+        //Set timeout
+        http.setTimeout(4500);
+
         http.addHeader("Content-Type", "application/json");
         int httpResponseCode = http.POST(jsonPayload);
 
