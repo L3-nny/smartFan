@@ -1,7 +1,6 @@
 #include "systemManager.h"
 #include "config.h"
 #include "thermal_math.h"
-#include <Arduino.h>
 
 
 void SystemManager::setup() {
@@ -15,6 +14,10 @@ void SystemManager::setup() {
 
 void SystemManager::update() {
     _gateway.maintainConnection();
+
+    // This runs EVERY SINGLE MICROSECOND
+    // You will see a wall of dots in your Serial Monitor
+    Serial.print(".");
 
     if (millis() - _lastUpdated >= _interval) {
         _lastUpdated = millis();
