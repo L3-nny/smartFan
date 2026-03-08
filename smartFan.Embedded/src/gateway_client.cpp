@@ -1,6 +1,8 @@
 #include "gateway_client.h"
 #include "config.h"
 
+// Ensure bool isFirstConnectionAttempt = true; is defined in your .h file!
+
 void GatewayClient::init() {
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     lastWifiRetry = millis();
@@ -8,11 +10,31 @@ void GatewayClient::init() {
 
 void GatewayClient::maintainConnection() {
     unsigned long currentTime = millis();
-    if (WiFi.status() != WL_CONNECTED && (currentTime - lastWifiRetry) >= 30000) {
-        Serial.println("Retriggering WiFi...");
+
+    //RUn if 30s padded or first time after boot
+    if ((WiFi.status() != WL_CONNECTED && (currentTime - lastWifiRetry) >= 30000) || (isFirstConnectionAttempt)) {
+        Serial.println(isFirstConnectionAttempt ? "[WiFi] First boot connection..." : "[WiFi] Reconnecting...");
+
         WiFi.disconnect();
         WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-        lastWifiRetry = currentTime;
+        
+        //wait for connection with a timeout
+        int attempts = 0;
+        while (WiFi.status() != WL_CONNECTED && attempts < 30) {
+            delay(500);
+            Serial.print(".");
+            attempts++;
+        }
+
+        if (WiFi.status() == WL_CONNECTED) {
+            Serial.println("\nWiFi reconnected! IP: ");
+            Serial.println(WiFi.localIP());
+        } else {
+            Serial.println("\nFailed to reconnect WiFi.");
+        }
+
+        isFirstConnectionAttempt = false; // Reset the flag so the 30s timer takes over
+        lastWifiRetry = millis();
     }
 }
 
