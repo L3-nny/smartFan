@@ -16,13 +16,13 @@ void GatewayClient::maintainConnection() {
     }
 }
 
-GatewayClient::FanCommand GatewayClient::sendTelemetry(float temperature) {
+GatewayClient::FanCommand GatewayClient::sendTelemetry(float celsius) {
     FanCommand result = {0, 0, false};
     
     if (WiFi.status() != WL_CONNECTED) return result;
 
     JsonDocument doc;
-    doc["t"] = temperature;
+    doc["t"] = celsius;
     
     String jsonPayload;
     serializeJson(doc, jsonPayload);
