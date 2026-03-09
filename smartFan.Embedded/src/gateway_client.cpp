@@ -1,7 +1,6 @@
 #include "gateway_client.h"
 #include "config.h"
 
-// Ensure bool isFirstConnectionAttempt = true; is defined in your .h file!
 
 void GatewayClient::init() {
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -58,6 +57,8 @@ GatewayClient::FanCommand GatewayClient::sendTelemetry(float celsius) {
 
     if (httpResponseCode > 0) {
         String response = http.getString();
+
+        
         JsonDocument responseDoc;
         if (!deserializeJson(responseDoc, response)) {
             result.speed = responseDoc["s"];
