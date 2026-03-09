@@ -1,0 +1,15 @@
+WIFI_SSID = "Your_WiFi_Name"
+
+WIFI_PASS = "Your_WiFi_Password"
+
+SERVER_URL = "x.x:3000/api/...."
+
+THERMISTOR_PIN = 34
+
+MOSFET_PWM_PIN = 13
+
+STATUS_LED_PIN = 2
+
+PWM_FREQ = 5000
+
+POLL_INTERVAL = 3000 (3 seconds)
