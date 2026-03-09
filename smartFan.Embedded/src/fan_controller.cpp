@@ -2,8 +2,9 @@
 #include "config.h"
 
 void FanController::init() {
-    ledcSetup(0, PWM_FREQ, 8);
-    ledcAttachPin(MOSFET_PIN, 0);
+    
+    pinMode(MOSFET_PIN, OUTPUT); // Pin 13
+    analogWrite(MOSFET_PIN, 0);
 }
 
 void FanController::updateState(int speed, int mode) {
@@ -16,7 +17,11 @@ void FanController::updateState(int speed, int mode) {
         default: pwmValue = 0; break; 
     }
 
-    ledcWrite(0, pwmValue);
+    // SMOKING GUN: If this doesn't print, updateState isn't being called
+    //REMOVE IN PROD
+    Serial.printf("[Hardware] Writing PWM %d to Pin %d\n", pwmValue, MOSFET_PIN);
+
+    analogWrite(MOSFET_PIN, pwmValue);
 
     //Visual feedback for manual mode
     if (mode == 1) {
@@ -27,6 +32,6 @@ void FanController::updateState(int speed, int mode) {
 }
 
 void FanController::setEmergencySpeed() {
-    ledcWrite(0, 85);
+    analogWrite(MOSFET_PIN, 85);
     digitalWrite(STATUS_LED_PIN, LOW); //Off to indicate error
 }
