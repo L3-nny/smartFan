@@ -17,7 +17,12 @@ void SystemManager::update() {
 
     // This runs EVERY SINGLE MICROSECOND
     // You will see a wall of dots in your Serial Monitor
-    Serial.print(".");
+    //REMOVE IN PROD, it's just to show that the system is alive and not frozen while waiting for the next tick
+    static unsigned long lastDot = 0;
+    if (millis() - lastDot >= 100) { 
+        Serial.print(".");
+        lastDot = millis();
+    }
 
     if (millis() - _lastUpdated >= _interval) {
         _lastUpdated = millis();
