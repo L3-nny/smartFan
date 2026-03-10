@@ -14,7 +14,7 @@ This state is simultaneously broadcast in real-time to a [`Blazor WebAssembly Da
 
 The physical layer relies on a precise voltage divider circuit for temperature acquisition and a logic level MOSFET for high current fan control. 
 
-*(Place your schematic image below)*
+![Smart Fan Schematic](./img/smartFan.svg)
 
 
 
@@ -103,4 +103,4 @@ Future iterations of this project will migrate the communication layer to **MQTT
 
 This project is actively evolving. Whether you are interested in discussing the hardware implementation, reviewing the .NET architecture, or proposing optimizations for the C++ firmware, collaboration is welcome. 
 
-Feel free to open an [`Issue`](https://github.com/L3-nny/smartFan/issues) or start a thread in the [`Discussions`](https://github.com/L3-nny/smartFan/discussions) tab of this repository to share insights, report bugs, or discuss the planned migration to MQTT.
+Feel free to open an [`Issue`](https://github.com/L3-nny/smartFan/issues) or start a thread in the [`Discussions`](https://github.com/L3-nny/smartFan/discussions/3) tab of this repository to share insights, report bugs, or discuss the planned migration to MQTT.cd 
