@@ -10,7 +10,7 @@ void GatewayClient::init() {
 void GatewayClient::maintainConnection() {
     unsigned long currentTime = millis();
 
-    //RUn if 30s padded or first time after boot
+    //Run if 30s padded or first time after boot
     if ((WiFi.status() != WL_CONNECTED && (currentTime - lastWifiRetry) >= 30000) || (isFirstConnectionAttempt)) {
         Serial.println(isFirstConnectionAttempt ? "[WiFi] First boot connection..." : "[WiFi] Reconnecting...");
 
