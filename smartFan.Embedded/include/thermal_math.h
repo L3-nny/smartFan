@@ -23,9 +23,9 @@ static double calculateCelsius(int rawValue) {
     //Steinhart-Hart equation
     double logR = log(dynamic_resistance);
     double param_c = logR * logR * logR;
-    double temperature = 1.0 / (A + (B * logR) + (C * param_c)); // Temperature in Kelvin   
+    double temperature = 1.0 / (A + (B * logR) + (C * param_c)); 
 
-    return temperature - 273.15; // Convert to Celsius
+    return temperature - 273.15;
 }
 
 };
