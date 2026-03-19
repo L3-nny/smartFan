@@ -48,7 +48,7 @@ namespace smartFan.Controllers
         {
             if (data == null || !ModelState.IsValid)
             {
-                _logger.LogWarning("Invalid JSON format received from ESP");
+                _logger.LogWarning("Invalid JSON format received from MCU");
                 return BadRequest("Invalid data format");
             }
 
@@ -76,7 +76,7 @@ namespace smartFan.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error processing telemetry data from ESP", ex);
+                _logger.LogError("Error processing telemetry data from MCU", ex);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
         }
