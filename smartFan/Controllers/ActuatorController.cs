@@ -45,7 +45,7 @@ namespace smartFan.Controllers
                     entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10);
                     
                     var currentSpeed = _actuatorService.CurrentSpeed;
-                    _logger.LogInfo($"Fresh fan speed reading: {currentSpeed}");
+                    _logger.LogInfo($"New fan speed reading: {currentSpeed}");
 
                     return new
                     {
