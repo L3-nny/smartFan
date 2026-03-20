@@ -17,13 +17,13 @@ static double calculateCelsius(int rawValue) {
     if (rawValue <= 0 || rawValue >= 4095) 
         return 0.0;
 
-    //calulate resistance
+    
     double dynamic_resistance = R_Balance / ((4095.0 / (double)rawValue) - 1.0);
 
     //Steinhart-Hart equation
-    double logR = log(dynamic_resistance);
-    double param_c = logR * logR * logR;
-    double temperature = 1.0 / (A + (B * logR) + (C * param_c)); 
+    double log_R = log(dynamic_resistance);
+    double param_c = log_R * log_R * log_R;
+    double temperature = 1.0 / (A + (B * log_R) + (C * param_c)); 
 
     return temperature - 273.15;
 }
