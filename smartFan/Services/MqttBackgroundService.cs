@@ -6,6 +6,7 @@ using MQTTnet.Extensions.ManagedClient;
 using MQTTnet.Packets;
 using smartFan.Models.DTOs;
 using smartFan.Services.Interfaces;
+using SQLitePCL;
 using System.Text;
 using System.Text.Json;
 
@@ -39,6 +40,20 @@ public class MqttBackgroundService : BackgroundService
             _logger.LogInformation("Connected to MQTT broker.");
             return Task.CompletedTask;
         };
+
+        _mqttClient.DisconnectedAsync += e =>
+        {
+            _logger.LogWarning($"MQTT Disconnected. Reason: {e.Reason}.  Attempting to reconnect...");
+            return Task.CompletedTask;
+        };
+
+        _mqttClient.ConnectingFailedAsync += e =>
+        {
+            _logger.LogError($"MQTT Connection failed. {e.Exception.Message}");
+            return Task.CompletedTask;
+        };
+
+
 
 
         _mqttClient.ApplicationMessageReceivedAsync += async e =>
