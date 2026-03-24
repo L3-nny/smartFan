@@ -1,4 +1,7 @@
+namespace smartFan.Services;
+
 using MQTTnet;
+using MQTTnet.Client;
 using MQTTnet.Extensions.ManagedClient;
 using MQTTnet.Packets;
 using smartFan.Models.DTOs;
@@ -25,7 +28,7 @@ public class MqttBackgroundService : BackgroundService
         var mqttOptions = new ManagedMqttClientOptionsBuilder()
             .WithAutoReconnectDelay(TimeSpan.FromSeconds(5))
             .WithClientOptions(new MqttClientOptionsBuilder()
-                .WithClientId("SmartFanSensorClient")
+                .WithClientId("SmartFanBackend")
                 .WithTcpServer("localhost", 1883)
                 .WithCredentials("", "")
                 .Build())
@@ -45,8 +48,22 @@ public class MqttBackgroundService : BackgroundService
                 var payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
                 _logger.LogInformation($"Received MQTT message on {e.ApplicationMessage.Topic}: {payload}");
 
-                var data = JsonSerializer.Deserialize<TelemetryModel>(payload, new JsonSerializerOptions);
-                _sensorService.RegisterHardwareReading(data);
+                var data = JsonSerializer.Deserialize<TelemetryModel>(payload);
+
+                if (data == null)
+                {
+                    _logger.LogWarning("Failed to deserialize MQTT payload.");
+                    return;
+                }
+
+                if (!data.Temperature.HasValue)
+                {
+                    _logger.LogWarning("Temperature value is missing in the MQTT message.");
+                    return;
+                }
+
+                _logger.LogInformation($"Parsed Temperature: {data.Temperature.Value}");
+                _sensorService.RegisterHardwareReading(data.Temperature.Value);
             }
             catch (Exception ex)
             {
