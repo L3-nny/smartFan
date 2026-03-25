@@ -76,6 +76,7 @@ builder.Services.Configure<FanSettingsModel>(builder.Configuration.GetSection("F
 
 // Register Background Services
 builder.Services.AddHostedService<BackgroundMonitorService>();
+builder.Services.AddHostedService<MqttBackgroundService>();
 
 var app = builder.Build();
 
