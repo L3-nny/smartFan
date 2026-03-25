@@ -6,8 +6,7 @@ namespace smartFan.Tests.Fixtures
 {
     public class MosquittoFixture : IAsyncLifetime
     {
-        public MosquittoContainer Container { get; } = new MosquittoBuilder()
-            .WithImage("eclipse-mosquitto:latest")
+        public MosquittoContainer Container { get; } = new MosquittoBuilder("eclipse-mosquitto:latest")
             .Build();
 
         public async Task InitializeAsync() => await Container.StartAsync();
