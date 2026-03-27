@@ -48,3 +48,15 @@ namespace smartFan.Tests.Integration.Mqtt
 
             await testClient.ConnectAsync(options, cts.Token);
 
+            // Create the payload: {"Temperature": 32.5}
+            var telemetry = new TelemetryModel { Temperature = 32.5 };
+            var jsonPayload = JsonSerializer.Serialize(telemetry);
+            
+            var message = new MqttApplicationMessageBuilder()
+                .WithTopic("smartFan/telemetry")
+                .WithPayload(jsonPayload)
+                .Build();
+
+            // Send it!
+            await testClient.PublishAsync(message, cts.Token);
+
