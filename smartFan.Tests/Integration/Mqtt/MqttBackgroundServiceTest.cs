@@ -1,6 +1,7 @@
 using Xunit;
 using Moq;
 using MQTTnet;
+using MQTTnet.Packets;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
