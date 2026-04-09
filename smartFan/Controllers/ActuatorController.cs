@@ -134,7 +134,7 @@ namespace smartFan.Controllers
                 return Ok(new
                 {
                     NewFanSpeed = speed.ToString(),
-                    Mode = "Manual",
+                    Mode = "ManualL",
                     Timestamp = DateTime.UtcNow
                 });
             }
